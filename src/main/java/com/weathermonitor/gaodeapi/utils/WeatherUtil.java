@@ -33,14 +33,13 @@ public class WeatherUtil {
     public final String WEATHER_URL = "https://restapi.amap.com/v3/weather/weatherInfo?";
 
     /**
-     * 拼接请求的url
-     * 发送get请求
+     * 拼接请求的url，params为城市编码
+     * 发送get请求，获取实时气象数据
      * @param params
      * @return
      */
     public JSONObject getCurrent(Map<String, String> params){
-
-        JSONObject jsonObject = null;
+        JSONObject liveWeather = null;
         CloseableHttpClient httpclient = HttpClients.createDefault();
 
         // 创建URI对象，并且设置请求参数
@@ -51,21 +50,21 @@ public class WeatherUtil {
             CloseableHttpResponse response = httpclient.execute(httpGet);
 
             // 判断返回状态是否为200
-            jsonObject = getRouteCurrent(response);
+            liveWeather = getLiveCurrent(response);
             httpclient.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return jsonObject;
+        return liveWeather;
     }
 
     /**
-     * 根据不同的路径规划获取距离
+     * 获取响应数据中的 live 实时气象数据部分
      * @param response
      * @return
      */
-    private static JSONObject getRouteCurrent(CloseableHttpResponse response) throws Exception{
+    private static JSONObject getLiveCurrent(CloseableHttpResponse response) throws Exception{
         JSONObject live = null;
         // 判断返回状态是否为200
         if (response.getStatusLine().getStatusCode() == 200) {
@@ -76,7 +75,7 @@ public class WeatherUtil {
             lives = (JSONArray) jsonObject.get("lives");
             live = (JSONObject) lives.get(0);
 
-            logger.info("返回的结果为:{}",JSONObject.toJSONString(live));
+            logger.info("返回的实时气象结果为:{}",JSONObject.toJSONString(live));
         }
         return live;
     }
