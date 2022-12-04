@@ -69,13 +69,11 @@ public class WeatherUtil {
         // 判断返回状态是否为200
         if (response.getStatusLine().getStatusCode() == 200) {
             String content = EntityUtils.toString(response.getEntity(), "UTF-8");
-            logger.info("调用高德地图接口返回的结果为:{}",content);
             JSONObject jsonObject = (JSONObject) JSONObject.parse(content);
             JSONArray lives;
             lives = (JSONArray) jsonObject.get("lives");
             live = (JSONObject) lives.get(0);
 
-            logger.info("返回的实时气象结果为:{}",JSONObject.toJSONString(live));
         }
         return live;
     }
@@ -96,7 +94,7 @@ public class WeatherUtil {
         uriBuilder.setParameter("key", key);
         uriBuilder.setParameter("city", adcode);
 
-        logger.info("请求的参数key为:{}, cityCode为:{}", key, adcode);
+        //logger.info("请求的参数key为:{}, cityCode为:{}", key, adcode);
         URI uri = uriBuilder.build();
         return uri;
     }
@@ -145,7 +143,7 @@ public class WeatherUtil {
         uriBuilder.setParameter("city", adcode);
         uriBuilder.setParameter("extensions", "all");
 
-        logger.info("请求的参数key为:{}, cityCode为:{}", key, adcode);
+        //logger.info("请求的参数key为:{}, cityCode为:{}", key, adcode);
         URI uri = uriBuilder.build();
         return uri;
     }
