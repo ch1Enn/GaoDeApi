@@ -29,10 +29,33 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @ServerEndpoint("/websocket")
 public class WebSocketSubject{
+    /**
+    * 成员属性
+    * 定时器，定时执行访问api任务
+    */
     private Timer timer = new Timer();
-    private Boolean timerCancelFlag = false;
+    /**
+    * 成员属性
+    * 定时器任务
+    */
+    private TimerTask task = new TimerTask() {
+        @Override
+        public void run() {
+
+        }
+    };
+    //private Boolean timerCancelFlag = false;
+    /**
+    * 成员属性
+    * 城市天气观察者列表
+     * 天气数据更新后通过观察者的 sendAllMessage 方法向前台发送消息
+    */
     private ArrayList<Observer> observers = new ArrayList<>();
 
+    /**
+    * 成员属性
+    * 保存前台请求过的城市的编码
+    */
     private ArrayList<String> cityCodes = new ArrayList<>();
 
 
@@ -96,6 +119,7 @@ public class WebSocketSubject{
          * something to do for close
          * */
         logger.info("WebSocket连接断开，{}", session.getId());
+        task.cancel();
         timer.cancel();
         clientMap.remove(session.getId());
     }
@@ -129,6 +153,9 @@ public class WebSocketSubject{
          * 查询方式为轮询 高德api
          * */
         logger.info("服务端收到的消息为：{}", message);
+        //取消之前的定时任务
+        task.cancel();
+        timer.cancel();
         //若后台请求的为新的一个城市
         //将发送过来的城市代码存储起来，并创建对应的观察者
         if(!cityCodes.contains(message)){
@@ -138,9 +165,11 @@ public class WebSocketSubject{
             attach(webSocketObserver);
         }
         logger.info("当前的城市即观察者列表：{}",cityCodes);
+        //WeatherController 获取高德api提供的气象数据
         WeatherController weatherController = new WeatherController();
         final ArrayList<JSONObject> cityWeathers = new ArrayList<>();
         logger.info("城市列表容量：{}", cityCodes.size());
+        //存储获取的气象数据
         for (int i = 0; i <= cityCodes.size(); i++){
             cityWeathers.add(null);
         }
@@ -148,10 +177,11 @@ public class WebSocketSubject{
 
         //轮询访问高德天气api
         //由于计时事件执行在Timer线程中，您必须确保访问Timer线程中任务中使用的任何数据项的正确同步。
-        TimerTask task = new TimerTask() {
+        task = new TimerTask() {
             @Override
             public void run() {
                 JSONObject[] live = {null};
+
                 for(int i = 0; i < cityCodes.size(); i++){
                     live[0] = weatherController.getWeather(cityCodes.get(i));
 
@@ -173,10 +203,8 @@ public class WebSocketSubject{
                 }
             }
         };
-        //取消之前的定时任务
-        timer.cancel();
-        timerCancelFlag = true;
+
         timer = new Timer();
-        timer.schedule(task,0,60*1000);
+        timer.schedule(task,0,60*1000*45);
     }
 }

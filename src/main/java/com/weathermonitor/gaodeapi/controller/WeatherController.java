@@ -12,8 +12,6 @@ import com.alibaba.fastjson.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * @author chieun Liang
@@ -23,6 +21,11 @@ import java.util.TimerTask;
 @RestController
 @RequestMapping("/weather")
 public class WeatherController {
+    /**
+    * 成员属性
+    * 天气实体类
+     * 提供获取天气实时数据的方法
+    */
     private static WeatherUtil weatherUtil = new WeatherUtil();
 
     /**日志对象*/

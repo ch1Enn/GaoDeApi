@@ -17,7 +17,6 @@ public class WebSocketObserver extends Observer {
         super(cityCode);
     }
 
-
     /**
      * 服务端向客户端发送气象数据
      *
@@ -41,8 +40,6 @@ public class WebSocketObserver extends Observer {
                     e.printStackTrace();
                 }
             }
-
-
         }
     }
 }
